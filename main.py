@@ -1,16 +1,44 @@
-# This is a sample Python script.
+import requests
+import json
+import time
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+# --------------------------------------
+# 요청 함수 정의 (기존 코드 활용)
+# --------------------------------------
+def RequestRegister(send, receive):
+    headers = {'Content-Type': 'application/json; charset=utf-8'}
+    data = {
+        "nodes": f"http://127.0.0.1:{receive}"
+    }
+    res = requests.post(f"http://127.0.0.1:{send}/nodes/register", headers=headers, data=json.dumps(data))
+    print(res.content)
+
+def RequestInputTransaction():
+    headers = {'Content-Type': 'application/json; charset=utf-8'}
+    body = {"sender": "mintae", "recipient": "mintae2", "amount": 3}
+    ports = ['5000', '5001']
+    for port in ports:
+        res = requests.post(f"http://127.0.0.1:{port}/transactions/new", headers=headers, data=json.dumps(body))
+        print(res.content)
+
+def RequestMineStart(port):
+    headers = {'Content-Type': 'application/json; charset=utf-8'}
+    res = requests.get(f"http://127.0.0.1:{port}/mine", headers=headers)
+    print(res.content)
+
+# --------------------------------------
+# 1. 노드 등록
+# --------------------------------------
+print("🔗 서로 노드 등록 중...")
+RequestRegister('5000', '5001')
+time.sleep(1)  # 안정성을 위해 약간의 대기
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
 
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+# --------------------------------------
+# 3. 채굴 시작
+# --------------------------------------
+print("⛏ 채굴 시작...")
+# 5000과 5001 동시에 채굴 시작
+for port in ['5000', '5001']:
+    RequestMineStart(port)
